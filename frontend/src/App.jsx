@@ -1,6 +1,10 @@
+import { useState } from 'react'
 import './App.css'
 
 function App() {
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [uploadStatus, setUploadStatus] = useState('')
+
   return (
     <div className="app">
       <header className="header">
@@ -25,9 +29,59 @@ function App() {
             against the evidence contained in the document.
           </p>
 
-          <button className="upload-button">
-            Upload Document
-          </button>
+          <div>
+            <input
+              id="document-upload"
+              type="file"
+              accept=".pdf,.txt"
+              hidden
+              onChange={async (event) => {
+                const file = event.target.files[0]
+
+                if (!file) return
+
+                setSelectedFile(file)
+                setUploadStatus('Uploading...')
+
+                const formData = new FormData()
+                formData.append('document', file)
+
+                try {
+                  const response = await fetch('http://localhost:5000/api/documents/upload', {
+                    method: 'POST',
+                    body: formData
+                  })
+
+                  const data = await response.json()
+
+                  if (!response.ok) {
+                    throw new Error(data.error || 'Upload failed')
+                  }
+
+                  setUploadStatus('Uploaded successfully')
+                } catch (error) {
+                  setUploadStatus(error.message)
+                }
+              }}
+            />
+
+            <label htmlFor="document-upload" className="upload-button">
+              Upload Document
+            </label>
+
+            {selectedFile && (
+              <p className="selected-file">
+                Selected: {selectedFile.name}
+              </p>
+            )}
+            {uploadStatus && (
+              <p className="selected-file">
+                {uploadStatus}
+              </p>
+            )}
+
+
+          </div>
         </section>
 
         <section className="matrix-section">

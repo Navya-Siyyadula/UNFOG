@@ -188,3 +188,9 @@ button {
     display: none;
   }
 }
+
+.selected-file {
+  margin: 14px 0 0;
+  color: #59645d;
+  font-size: 14px;
+}
